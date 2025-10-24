@@ -1,33 +1,26 @@
 package com.ClinicaOdontologica.UP.service;
 
-import com.ClinicaOdontologica.UP.dao.iDao;
-import com.ClinicaOdontologica.UP.model.Paciente;
+import com.ClinicaOdontologica.UP.entity.Paciente;
+import com.ClinicaOdontologica.UP.repository.PacienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PacienteService {
-    private iDao<Paciente> pacienteiDao;
-
     @Autowired
-    public PacienteService(iDao<Paciente> pacienteiDao) {
-        this.pacienteiDao = pacienteiDao;
-    }
+    private PacienteRepository pacienteRepository;
+
     public Paciente guardarPaciente(Paciente paciente){
-        return pacienteiDao.guardar(paciente);
+        return pacienteRepository.save(paciente);
     }
-    public Paciente buscarPacientePorId(Integer id){
-        return pacienteiDao.buscar(id);
+
+    public Optional<Paciente> buscarPorId(Long id){
+        return pacienteRepository.findById(id);
     }
-    public List<Paciente> buscarPacientes(){
-        return pacienteiDao.buscarTodos();
+    public Optional<Paciente> buscarPorEmail(String email){
+        return pacienteRepository.findByEmail(email);
     }
-    public void eliminarPaciente(Integer id){
-        pacienteiDao.eliminar(id);
-    }
-    public void actualizar(Paciente paciente){
-        pacienteiDao.actualizar(paciente);
-    }
+
 }

@@ -1,32 +1,26 @@
 package com.ClinicaOdontologica.UP.service;
 
-import com.ClinicaOdontologica.UP.dao.iDao;
-import com.ClinicaOdontologica.UP.model.Odontologo;
+import com.ClinicaOdontologica.UP.entity.Odontologo;
+import com.ClinicaOdontologica.UP.repository.OdontologoRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Optional;
 
+@Service
 public class OdontologoService {
-    private iDao<Odontologo> odontologoiDao;
+    @Autowired
+    private OdontologoRepository odontologoRepository;
 
-    public OdontologoService(iDao<Odontologo> odontologoiDao) {
-        this.odontologoiDao = odontologoiDao;
-    }
     public Odontologo guardarOdontologo(Odontologo odontologo){
-        return odontologoiDao.guardar(odontologo);
+        return odontologoRepository.save(odontologo);
     }
-    public Odontologo buscarOdontologoPorId(Integer id){
-        return odontologoiDao.buscar(id);
+
+    public Optional<Odontologo> buscarPorId(Long id){
+        return odontologoRepository.findById(id);
     }
-    public List<Odontologo> buscarOdontologos(){
-        return odontologoiDao.buscarTodos();
-    }
-    public void eliminarOdontologo(Integer id) {
-        odontologoiDao.eliminar(id);
-    }
-    public void actualizarOdontologo(Odontologo parcial) {
-        odontologoiDao.actualizar(parcial);
-    }
-    public Odontologo buscarGenerico(String parametro) {
-        return odontologoiDao.buscarGenerico(parametro);
+
+    public Optional<Odontologo> buscarPorMatricula(String matricula){
+        return odontologoRepository.findByMatricula(matricula);
     }
 }

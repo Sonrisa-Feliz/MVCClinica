@@ -1,15 +1,12 @@
 package com.ClinicaOdontologica.UP.Controller;
 
-import com.ClinicaOdontologica.UP.model.Paciente;
+import com.ClinicaOdontologica.UP.entity.Paciente;
 import com.ClinicaOdontologica.UP.service.PacienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Optional;
 
 @RestController// Sin tecnologia de Vista
 @RequestMapping("/paciente")  // Todo lo que venga desde /paciente endpoint.
@@ -23,18 +20,28 @@ public class PacienteController {
     }
     // Aqui deben venir todos los metodos que conectan al service
     @GetMapping("/{id}")
-    public ResponseEntity<Paciente> buscarPorId(@PathVariable Integer id){
-        Paciente pacienteBuscado = pacienteService.buscarPacientePorId(id);
-        if(pacienteBuscado != null){
+    public ResponseEntity<Paciente> buscarPorId(@PathVariable Long id){
+        Optional<Paciente> pacienteBuscado = pacienteService.buscarPorId(id);
+        if(pacienteBuscado.isPresent()){
             //System.out.println("Paciente encontrado");
-            return ResponseEntity.ok(pacienteBuscado);
+            return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.notFound().build();
         }
     }
-    @GetMapping
-    public ResponseEntity<List<Paciente>> listarPacientes(){
-        return ResponseEntity.ok(pacienteService.buscarPacientes());
+//    @GetMapping
+//    public ResponseEntity<List<Paciente>> listarPacientes(){
+//        return ResponseEntity.ok(pacienteService.buscarPacientes());
+//    }
+    @PostMapping
+    public ResponseEntity<Paciente> registrarPaciente(@RequestBody Paciente paciente){
+        Optional<Paciente> pacienteBuscado = pacienteService.buscarPorEmail(paciente.getEmail());
+        if(pacienteBuscado.isPresent()){
+            return ResponseEntity.badRequest().build();
+        } else {
+            return ResponseEntity.ok(pacienteService.guardarPaciente(paciente));
+        }
+
     }
 
 }
