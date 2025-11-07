@@ -1,11 +1,15 @@
 package com.ClinicaOdontologica.UP.Controller;
 
+import com.ClinicaOdontologica.UP.Exception.BadEmailException;
+import com.ClinicaOdontologica.UP.Exception.PacienteYaRegistradoException;
+import com.ClinicaOdontologica.UP.Exception.ResourceNotFoundException;
 import com.ClinicaOdontologica.UP.entity.Paciente;
 import com.ClinicaOdontologica.UP.service.PacienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController// Sin tecnologia de Vista
@@ -19,29 +23,44 @@ public class PacienteController {
         this.pacienteService = pacienteService;
     }
     // Aqui deben venir todos los metodos que conectan al service
-    @GetMapping("/{id}")
-    public ResponseEntity<Paciente> buscarPorId(@PathVariable Long id){
-        Optional<Paciente> pacienteBuscado = pacienteService.buscarPorId(id);
-        if(pacienteBuscado.isPresent()){
-            //System.out.println("Paciente encontrado");
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-//    @GetMapping
-//    public ResponseEntity<List<Paciente>> listarPacientes(){
-//        return ResponseEntity.ok(pacienteService.buscarPacientes());
+//    @GetMapping("/{id}")
+//    public ResponseEntity<Paciente> buscarPorId(@PathVariable Long id){
+//        Optional<Paciente> pacienteBuscado = pacienteService.buscarPorId(id);
+//        if(pacienteBuscado.isPresent()){
+//            //System.out.println("Paciente encontrado");
+//            return ResponseEntity.ok().build();
+//        } else {
+//            return ResponseEntity.notFound().build();
+//        }
 //    }
+    @GetMapping
+    public ResponseEntity<List<Paciente>> listarPacientes(){
+        return ResponseEntity.ok(pacienteService.buscarTodosLosPacientes());
+    }
     @PostMapping
-    public ResponseEntity<Paciente> registrarPaciente(@RequestBody Paciente paciente){
+    public ResponseEntity<Paciente> registrarPaciente(@RequestBody Paciente paciente) throws BadEmailException, PacienteYaRegistradoException {
         Optional<Paciente> pacienteBuscado = pacienteService.buscarPorEmail(paciente.getEmail());
         if(pacienteBuscado.isPresent()){
-            return ResponseEntity.badRequest().build();
+            throw new PacienteYaRegistradoException("El paciente a registrar ya existe");
+            //return ResponseEntity.badRequest().build();
         } else {
-            return ResponseEntity.ok(pacienteService.guardarPaciente(paciente));
+            if (paciente.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+                return ResponseEntity.ok(pacienteService.guardarPaciente(paciente));
+            } else {
+                throw new BadEmailException("Email incorrectamente ingresado");
+            }
         }
-
     }
 
+    // Aqui deben venir todos los metodos que conectan al service
+    @GetMapping("/{email}")
+    public ResponseEntity<Optional<Paciente>> buscarPorEmail(@PathVariable String email) throws ResourceNotFoundException {
+        Optional<Paciente> pacienteBuscado = pacienteService.buscarPorEmail(email);
+        if(pacienteBuscado.isPresent()){
+            //System.out.println("Paciente encontrado");
+            return ResponseEntity.ok(pacienteBuscado);
+        } else {
+            throw new ResourceNotFoundException("Paciente no encontrado");
+        }
+    }
 }

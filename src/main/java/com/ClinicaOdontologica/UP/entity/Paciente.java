@@ -1,10 +1,13 @@
 package com.ClinicaOdontologica.UP.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Setter
 @Getter
@@ -27,27 +30,30 @@ public class Paciente {
     private Domicilio domicilio;
     @Column(unique = true)
     private String email;
+    @OneToMany(mappedBy = "paciente", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<Turno> turnos = new HashSet<>();
 
-    public Paciente(Long id, String nombre, String apellido, Integer numeroContacto, LocalDate fechaIngreso, Domicilio domicilio, String email) {
+    public Paciente(Long id, String nombre, String apellido, Integer numeroContacto, LocalDate fechaIngreso, String email, Domicilio domicilio) {
         this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
         this.numeroContacto = numeroContacto;
         this.fechaIngreso = fechaIngreso;
-        this.domicilio = domicilio;
         this.email = email;
+        this.domicilio = domicilio;
     }
 
     public Paciente() {
     }
 
-    public Paciente(String email, Domicilio domicilio, LocalDate fechaIngreso, Integer numeroContacto, String apellido, String nombre) {
+    public Paciente(String nombre, String apellido, Integer numeroContacto, LocalDate fechaIngreso, String email, Domicilio domicilio) {
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.numeroContacto = numeroContacto;
+        this.fechaIngreso = fechaIngreso;
         this.email = email;
         this.domicilio = domicilio;
-        this.fechaIngreso = fechaIngreso;
-        this.numeroContacto = numeroContacto;
-        this.apellido = apellido;
-        this.nombre = nombre;
     }
 
     @Override

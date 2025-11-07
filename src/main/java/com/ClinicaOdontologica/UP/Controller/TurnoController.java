@@ -9,11 +9,9 @@ import com.ClinicaOdontologica.UP.service.PacienteService;
 import com.ClinicaOdontologica.UP.service.TurnoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController// Sin tecnologia de Vista
@@ -41,5 +39,10 @@ public class TurnoController {
         } else {
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    @GetMapping
+    public ResponseEntity<List<TurnoDTO>> listarTurnosDTO() {
+        return ResponseEntity.ok(turnoService.listarTurnos());
     }
 }

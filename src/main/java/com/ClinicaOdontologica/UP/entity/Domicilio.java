@@ -38,6 +38,4 @@ public class Domicilio {
         this.localidad = localidad;
         this.provincia = provincia;
     }
-
-
 }

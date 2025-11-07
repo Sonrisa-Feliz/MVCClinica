@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Setter
 @Getter
 @Entity
@@ -18,6 +21,8 @@ public class Odontologo {
     private String apellido;
     @Column(unique = true, nullable = false)
     private String matricula;
+    @OneToMany(mappedBy = "odontologo", fetch = FetchType.LAZY)
+    private Set<Turno> turnos = new HashSet<>();
 
     public Odontologo(Long id, String nombre, String apellido, String matricula) {
         this.id = id;

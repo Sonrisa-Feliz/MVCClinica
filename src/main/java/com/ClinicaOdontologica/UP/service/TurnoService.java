@@ -6,6 +6,9 @@ import com.ClinicaOdontologica.UP.repository.TurnoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class TurnoService {
     private TurnoRepository turnoRepository;
@@ -18,6 +21,15 @@ public class TurnoService {
     public TurnoDTO guardarTurno(Turno turno) {
         Turno turnoGuardado = turnoRepository.save(turno);
         return turnoATurnoDTO(turnoGuardado);
+    }
+
+    public List<TurnoDTO> listarTurnos() {
+        List<Turno> turnos = turnoRepository.findAll();
+        List<TurnoDTO> listaTurnosDTO = new ArrayList<>();
+        for (Turno turno : turnos) {
+            listaTurnosDTO.add(turnoATurnoDTO(turno));
+        }
+        return listaTurnosDTO;
     }
 
     public TurnoDTO turnoATurnoDTO(Turno turno) {
