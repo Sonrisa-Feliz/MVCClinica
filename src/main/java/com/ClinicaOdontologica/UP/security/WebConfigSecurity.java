@@ -32,13 +32,14 @@ public class WebConfigSecurity {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable)  // Desactivo las referencias cruzadas para construcción, deberia estar activado cuando salga a PROD.
-                .authorizeHttpRequests((authz) -> authz
-                        .requestMatchers("/index.html").hasRole("USER")
-                        .requestMatchers("/get_pacientes.html").hasRole("ADMIN")
-                        .anyRequest().authenticated()
-                )
-                .formLogin(withDefaults()).logout(withDefaults());
+//        http.csrf(AbstractHttpConfigurer::disable)  // Desactivo las referencias cruzadas para construcción, deberia estar activado cuando salga a PROD.
+//                .authorizeHttpRequests((authz) -> authz
+//                        .requestMatchers("/index.html").hasRole("USER")
+//                        .requestMatchers("/get_pacientes.html").hasRole("ADMIN")
+//                        .anyRequest().authenticated()
+//                )
+//                .formLogin(withDefaults()).logout(withDefaults());
+        http.csrf(AbstractHttpConfigurer::disable);
         return http.build();
 
 

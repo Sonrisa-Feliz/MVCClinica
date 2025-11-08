@@ -7,6 +7,7 @@ import com.ClinicaOdontologica.UP.entity.Paciente;
 import com.ClinicaOdontologica.UP.service.PacienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,16 +24,16 @@ public class PacienteController {
         this.pacienteService = pacienteService;
     }
     // Aqui deben venir todos los metodos que conectan al service
-//    @GetMapping("/{id}")
-//    public ResponseEntity<Paciente> buscarPorId(@PathVariable Long id){
-//        Optional<Paciente> pacienteBuscado = pacienteService.buscarPorId(id);
-//        if(pacienteBuscado.isPresent()){
-//            //System.out.println("Paciente encontrado");
-//            return ResponseEntity.ok().build();
-//        } else {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
+    @GetMapping("/BuscarPorId/{id}")
+    public ResponseEntity<Optional<Paciente>> buscarPorId(@PathVariable Long id){
+        Optional<Paciente> pacienteBuscado = pacienteService.buscarPorId(id);
+        if(pacienteBuscado.isPresent()){
+            //System.out.println("Paciente encontrado");
+            return ResponseEntity.ok(pacienteBuscado);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
     @GetMapping
     public ResponseEntity<List<Paciente>> listarPacientes(){
         return ResponseEntity.ok(pacienteService.buscarTodosLosPacientes());
@@ -51,6 +52,16 @@ public class PacienteController {
             }
         }
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<Paciente> actualizarPaciente(@RequestBody Paciente paciente) throws ResourceNotFoundException {
+        Optional<Paciente> pacienteBuscado = pacienteService.buscarPorId(paciente.getId());
+        if(pacienteBuscado.isEmpty()){
+            throw new ResourceNotFoundException("Paciente no encontrado");
+            //return ResponseEntity.badRequest().build();
+        } else {
+            return ResponseEntity.ok(pacienteService.guardarPaciente(paciente));
+        }
+    }
 
     // Aqui deben venir todos los metodos que conectan al service
     @GetMapping("/{email}")
@@ -59,6 +70,18 @@ public class PacienteController {
         if(pacienteBuscado.isPresent()){
             //System.out.println("Paciente encontrado");
             return ResponseEntity.ok(pacienteBuscado);
+        } else {
+            throw new ResourceNotFoundException("Paciente no encontrado");
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarPaciente(@PathVariable Long id) throws ResourceNotFoundException{
+        Optional<Paciente> pacienteBuscado = pacienteService.buscarPorId(id);
+        if(pacienteBuscado.isPresent()){
+            pacienteService.borrarPaciente(id);
+            return ResponseEntity.ok().build();
+
         } else {
             throw new ResourceNotFoundException("Paciente no encontrado");
         }

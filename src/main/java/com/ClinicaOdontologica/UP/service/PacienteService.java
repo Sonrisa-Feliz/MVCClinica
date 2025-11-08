@@ -17,6 +17,7 @@ public class PacienteService {
         return pacienteRepository.save(paciente);
     }
 
+
     public Optional<Paciente> buscarPorId(Long id){
         return pacienteRepository.findById(id);
     }
@@ -25,6 +26,9 @@ public class PacienteService {
     }
     public List<Paciente> buscarTodosLosPacientes(){
         return pacienteRepository.findAll();
+    }
+    public void borrarPaciente(Long id){
+        pacienteRepository.deleteById(id);
     }
 
 }
