@@ -32,7 +32,7 @@ public class Paciente {
     @Column(unique = true)
     private String email;
     @OneToMany(mappedBy = "paciente", fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @JsonManagedReference(value="paciente-turno")
     private Set<Turno> turnos = new HashSet<>();
 
     public Paciente(Long id, String nombre, String apellido, Integer numeroContacto, LocalDate fechaIngreso, String email, Domicilio domicilio) {

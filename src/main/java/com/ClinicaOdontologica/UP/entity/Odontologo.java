@@ -23,7 +23,7 @@ public class Odontologo {
     @Column(unique = true, nullable = false)
     private String matricula;
     @OneToMany(mappedBy = "odontologo", fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @JsonManagedReference(value="odontologo-turno")
     private Set<Turno> turnos = new HashSet<>();
 
     public Odontologo(Long id, String nombre, String apellido, String matricula) {

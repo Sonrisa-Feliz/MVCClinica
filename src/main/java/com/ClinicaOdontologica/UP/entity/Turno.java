@@ -18,11 +18,11 @@ public class Turno {
     private Long id;
     @ManyToOne
     @JoinColumn(name = "paciente_id", referencedColumnName = "id")
-    @JsonBackReference
+    @JsonBackReference(value="paciente-turno")
     private Paciente paciente;
     @ManyToOne
     @JoinColumn(name = "odontologo_id", referencedColumnName = "id")
-    @JsonBackReference
+    @JsonBackReference(value="odontologo-turno")
     private Odontologo odontologo;
     @Column
     private LocalDate fecha;
