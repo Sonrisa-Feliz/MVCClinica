@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TurnoService {
@@ -23,21 +25,34 @@ public class TurnoService {
         return turnoATurnoDTO(turnoGuardado);
     }
 
+    public void borrarTurno(Long id){
+        turnoRepository.deleteById(id);
+    }
+
+    public Optional<TurnoDTO> buscarPorId(Long id) {
+        return turnoRepository.findById(id)
+                .map(this::turnoATurnoDTO);
+    }
+
     public List<TurnoDTO> listarTurnos() {
         List<Turno> turnos = turnoRepository.findAll();
         List<TurnoDTO> listaTurnosDTO = new ArrayList<>();
         for (Turno turno : turnos) {
             listaTurnosDTO.add(turnoATurnoDTO(turno));
         }
-        return listaTurnosDTO;
+        return listaTurnosDTO.stream()
+                .sorted((e1, e2) -> e1.getFecha().compareTo(e2.getFecha()))
+                .collect(Collectors.toList());
     }
 
     public TurnoDTO turnoATurnoDTO(Turno turno) {
         TurnoDTO turnoDTO = new TurnoDTO();
 
         turnoDTO.setId(turno.getId());
-        turnoDTO.setPacienteId(turno.getPaciente().getId());
-        turnoDTO.setOdontologoId(turno.getOdontologo().getId());
+        turnoDTO.setPacienteNombre(turno.getPaciente().getNombre());
+        turnoDTO.setPacienteApellido(turno.getPaciente().getApellido());
+        turnoDTO.setOdontologoNombre(turno.getOdontologo().getNombre());
+        turnoDTO.setOdontologoApellido(turno.getOdontologo().getApellido());
         turnoDTO.setFecha(turno.getFecha());
 
         return turnoDTO;

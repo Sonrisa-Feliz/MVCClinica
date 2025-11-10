@@ -1,5 +1,6 @@
 package com.ClinicaOdontologica.UP.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,10 +18,18 @@ public class Turno {
     private Long id;
     @ManyToOne
     @JoinColumn(name = "paciente_id", referencedColumnName = "id")
+    @JsonBackReference
     private Paciente paciente;
     @ManyToOne
     @JoinColumn(name = "odontologo_id", referencedColumnName = "id")
+    @JsonBackReference
     private Odontologo odontologo;
     @Column
     private LocalDate fecha;
+
+    public Turno(Paciente paciente, Odontologo odontologo, LocalDate fecha) {
+        this.paciente = paciente;
+        this.odontologo = odontologo;
+        this.fecha = fecha;
+    }
 }

@@ -1,5 +1,6 @@
 package com.ClinicaOdontologica.UP.Controller;
 
+import com.ClinicaOdontologica.UP.Exception.ResourceNotFoundException;
 import com.ClinicaOdontologica.UP.dto.TurnoDTO;
 import com.ClinicaOdontologica.UP.entity.Odontologo;
 import com.ClinicaOdontologica.UP.entity.Paciente;
@@ -44,5 +45,17 @@ public class TurnoController {
     @GetMapping
     public ResponseEntity<List<TurnoDTO>> listarTurnosDTO() {
         return ResponseEntity.ok(turnoService.listarTurnos());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarTurno(@PathVariable Long id) throws ResourceNotFoundException {
+        Optional<TurnoDTO> turnoBuscado = turnoService.buscarPorId(id);
+        if(turnoBuscado.isPresent()){
+            turnoService.borrarTurno(id);
+            return ResponseEntity.ok().build();
+
+        } else {
+            throw new ResourceNotFoundException("Paciente no encontrado");
+        }
     }
 }

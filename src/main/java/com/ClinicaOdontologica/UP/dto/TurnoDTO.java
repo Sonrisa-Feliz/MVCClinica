@@ -10,7 +10,9 @@ import java.time.LocalDate;
 public class TurnoDTO {
     private Long id;
     private LocalDate fecha;
-    private Long pacienteId;
-    private Long odontologoId;
+    private String pacienteNombre;
+    private String pacienteApellido;
+    private String odontologoNombre;
+    private String odontologoApellido;
 
 }
