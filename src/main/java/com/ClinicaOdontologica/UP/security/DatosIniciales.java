@@ -3,6 +3,7 @@ package com.ClinicaOdontologica.UP.security;
 import com.ClinicaOdontologica.UP.entity.*;
 import com.ClinicaOdontologica.UP.repository.OdontologoRepository;
 import com.ClinicaOdontologica.UP.repository.PacienteRepository;
+import com.ClinicaOdontologica.UP.repository.TurnoRepository;
 import com.ClinicaOdontologica.UP.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -22,6 +23,8 @@ public class DatosIniciales implements ApplicationRunner {
     private OdontologoRepository odontologoRepository;
     @Autowired
     private BCryptPasswordEncoder codificador;
+    @Autowired
+    private TurnoRepository turnoRepository;
 
 
     @Override
@@ -44,8 +47,14 @@ public class DatosIniciales implements ApplicationRunner {
         Paciente paciente3 = new Paciente("Ned","Flanders", 567890345, LocalDate.of(2025,5,6), "Ned@EnCristo.com", domicilioNed);
         pacienteRepository.save(paciente3);
 
-        Odontologo odontologo = new Odontologo("Fake123123","Nick","Rivera");
+        Odontologo odontologo = new Odontologo("Fake123123","Rivera","Nick");
         odontologoRepository.save(odontologo);
+
+        Turno turno = new Turno(paciente,odontologo,LocalDate.of(2025,11,16));
+        turnoRepository.save(turno);
+
+        Turno turno2 = new Turno(paciente3,odontologo,LocalDate.of(2025,11,15));
+        turnoRepository.save(turno2);
 
 
     }
