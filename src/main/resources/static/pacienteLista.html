@@ -6,6 +6,7 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -18,7 +19,9 @@
                 Agregar paciente
             </button>
         </div>
-
+        <div>
+            <input class="form-control" id="buscarTabla" type="text" placeholder="Buscar...">
+        </div>
         <div class="row col-md-auto table-responsive">
             <table id="pacienteTable" class="table table-striped">
                 <thead>
@@ -29,6 +32,7 @@
                     <th>Numero de Contacto</th>
                     <th>Fecha de Ingreso</th>
                     <th>email</th>
+                    <th></th>
                     <th></th>
                     <th></th>
                 </tr>
@@ -172,6 +176,58 @@
 </div>
 <!-- Modal Ver / Modificar Paciente -->
 
+<!-- Modal Turnos Paciente -->
+<div class="modal fade" id="turnosModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="turnosPacienteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" >Turnos del Paciente</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body">
+                <form class="row g-3" id="turnosPaciente_form">
+
+                    <div class="col-md-6">
+                        <h4>Juan</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <h4>Perez</h4>
+                    </div>
+                    <div id="turnosProximos">
+                        <h3>Sus próximos turnos son:</h3>
+                    </div>
+                    <div id="turnosPrevios">
+                        <h3>Sus turnos previos fueron en:</h3>
+                    </div>
+                    <div class="col-md-12">
+                        <h3>Reserve un nuevo Turno</h3>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text" id="datepicker" placeholder="Seleccione una fecha">
+                    </div>
+                    <div class="col-md-6">
+                        <select class="form-select" aria-label="Default select example">
+                            <option selected>Seleccione un Odontólogo</option>
+                            <option value="1">Dr. 1</option>
+                            <option value="2">Dr. 2</option>
+                            <option value="3">Dr. 3</option>
+                        </select>
+                    </div>
+
+
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-danger" id="btnToggleTurnos">Modificar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Turnos Paciente -->
+
 <!-- Modal: Confirmar borrado -->
 <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -198,12 +254,30 @@
 <script type="text/javascript" src="/js/add_Paciente.js"></script>
 <script type="text/javascript" src="/js/delete_Paciente.js"></script>
 <script type="text/javascript" src="/js/update_Paciente.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
 <script>
     $(function(){
         $("#includednavBar").load("fragments/navbar.html");
+    });
+    $(document).ready(function(){
+        $("#buscarTabla").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("#pacienteTableBody tr").filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+    });
+    // Initialize Flatpickr
+    flatpickr("#datepicker", {
+        locale: "es",
+        dateFormat: "Y-m-d", // Format: Year-Month-Day
+        minDate: "today", // Disable past dates
+        //maxDate: "2023-12-31" // Example max date
+        altInput: true,
     });
 </script>
 </body>

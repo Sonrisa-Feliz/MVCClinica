@@ -42,7 +42,7 @@ public class PacienteController {
     public ResponseEntity<Paciente> registrarPaciente(@RequestBody Paciente paciente) throws BadEmailException, PacienteYaRegistradoException {
         Optional<Paciente> pacienteBuscado = pacienteService.buscarPorEmail(paciente.getEmail());
         if(pacienteBuscado.isPresent()){
-            throw new PacienteYaRegistradoException("El paciente a registrar ya existe");
+            throw new PacienteYaRegistradoException("El paciente a registrar ya existe con ese email");
             //return ResponseEntity.badRequest().build();
         } else {
             if (paciente.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {

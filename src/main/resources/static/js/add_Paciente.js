@@ -11,6 +11,7 @@ window.addEventListener('load', () => {
 
     if (!form) return;
 
+    // Definimos la fecha de hoy para el payload, en formato YYYY-MM-DD
     function todayLocalYYYYMMDD() {
         const now = new Date();
         const tzOffset = now.getTimezoneOffset(); // en minutos
@@ -21,20 +22,19 @@ window.addEventListener('load', () => {
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
 
-        // Armar payload (lo que tu backend espera para crear el paciente)
+        // Armar payload (Para el PacienteController)
         const payload = {
             nombre: document.querySelector('#add_nombre')?.value.trim() || '',
             apellido: document.querySelector('#add_apellido')?.value.trim() || '',
             numeroContacto: document.querySelector('#add_numContacto')?.value.trim() || '',
             email: document.querySelector('#add_email')?.value.trim() || '',
-            fechaIngreso: todayLocalYYYYMMDD(),   // <-- agregado acá
+            fechaIngreso: todayLocalYYYYMMDD(),
             domicilio: {
                 calle: document.querySelector('#add_domi_calle')?.value.trim() || '',
                 numero: Number(document.querySelector('#add_domi_numero')?.value.trim() || 0),
                 localidad: document.querySelector('#add_domi_localidad')?.value.trim() || '',
                 provincia: document.querySelector('#add_domi_provincia')?.value.trim() || ''
             }
-            // fechaIngreso: la debería setear el backend; no la mandamos desde el form
         };
 
         try {
@@ -44,9 +44,34 @@ window.addEventListener('load', () => {
                 body: JSON.stringify(payload)
             });
 
-            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            if (!resp.ok) {
+                let errorMsg = 'No se pudo agregar el paciente. Intentá nuevamente.';
+                try {
+                    // Intentar parsear JSON (caso del GlobalExceptionHandler, para mostrar mensaje de error retornado en el Toast)
+                    const errorBody = await resp.json();
 
-            // Intentar leer el JSON creado (puede venir 201 con body)
+                    if (errorBody) {
+                        if (typeof errorBody === 'string') {
+                            errorMsg = errorBody;
+                        } else if (errorBody.message) {
+                            errorMsg = errorBody.message;
+                        } else if (errorBody.error) {
+                            errorMsg = errorBody.error;
+                        }
+                    }
+                } catch (e) {
+                    // Si no viene JSON, intento leer texto plano
+                    try {
+                        const text = await resp.text();
+                        if (text) errorMsg = text;
+                    } catch (e2) {
+                        // si tampoco puedo leer texto, me quedo con el mensaje por defecto
+                    }
+                }
+                throw new Error(errorMsg);
+            }
+
+            // Intentar leer el JSON creado del Paciente (puede venir 201 con body)
             let data = null;
             try { data = await resp.json(); } catch (_) {}
 
@@ -56,31 +81,57 @@ window.addEventListener('load', () => {
 
             // Insertar fila en la tabla si vino el objeto creado; si no, refrescar
             if (data && data.id) {
-                const table = document.getElementById('pacienteTable');
+                const table = document.getElementById('pacienteTableBody');
                 if (table) {
                     const row = table.insertRow();
                     const tr_id = 'tr_' + data.id;
                     row.id = tr_id;
 
-                    // Botones compatibles con tu listado/handlers existentes
-                    const updateButton = '<button' +
-                        ' id=' + '\"' + 'btn_id_' + data.id + '\"' +
-                        ' type="button" onclick="findBy(' + data.id + ')" class="btn btn-primary btn_id">' +
-                        '<i class=\"bi bi-eye-fill\"></i>' +
-                        '</button>';
+                    // Creamos los mismos botones del get_paciente
+                    let deleteButton = `<button
+                      id="btn_delete_${data.id}"
+                      type="button"
+                      class="btn btn-danger btn_delete"
+                      data-bs-toggle="modal"
+                      data-bs-target="#confirmDeleteModal"
+                      data-paciente-id="${data.id}"
+                      data-paciente-nombre="${data.nombre} ${data.apellido}">
+                      <i class="bi bi-trash"></i>
+                    </button>`;
 
-                    const deleteButton =
-                        '<button id="btn_delete_' + data.id + '" type="button" ' +
-                        'onclick="deleteBy(' + data.id + ')" class="btn btn-danger btn_delete">' +
-                        '<i class="bi bi-trash"></i></button>';
+                    //por cada paciente creamos un boton que al hacerle clic invocará
+                    //a la función de java script findBy que se encargará de buscar el paciente que queremos
+                    //modificar y mostrar los datos del mismo en un formulario.
+                    let updateButton = `<button
+                      id="btn_id_${data.id}"
+                      type="button"
+                      onclick="findBy(${data.id})" 
+                      class="btn btn-secondary btn_id">
+                      <i class="bi bi-eye-fill"></i>
+                    </button>`;
+
+                    //por cada paciente creamos un boton que al hacerle clic invocará
+                    //el modal de Administrar Turnos para ese paciente.
+                    let turnosButton = `<button
+                      id="btn_pacienteTurno_${data.id}"
+                      type="button"
+                      class="btn btn-primary btn_turno"
+                      data-bs-toggle="modal"
+                      data-bs-target="#turnosModal"
+                      data-paciente-id="${data.id}"
+                      data-paciente-nombre="${data.nombre} ${data.apellido}">
+                      <i class="bi bi-calendar3"></i>
+                    </button>`;
+
 
                     row.innerHTML =
                         '<td class="td_id">' + data.id + '</td>' +
                         '<td class="td_nombre">' + (data.nombre ?? payload.nombre) + '</td>' +
                         '<td class="td_apellido">' + (data.apellido ?? payload.apellido) + '</td>' +
                         '<td class="td_contacto">' + (data.numeroContacto ?? payload.numeroContacto) + '</td>' +
-                        '<td class="td_contacto">' + (data.fechaIngreso ?? '') + '</td>' +
-                        '<td class="td_contacto">' + (data.email ?? payload.email) + '</td>' +
+                        '<td class="td_fechaIngreso">' + (data.fechaIngreso ?? '') + '</td>' +
+                        '<td class="td_email">' + (data.email ?? payload.email) + '</td>' +
+                        '<td>' + turnosButton + '</td>' +
                         '<td>' + updateButton + '</td>' +
                         '<td>' + deleteButton + '</td>';
                 } else {
@@ -92,8 +143,8 @@ window.addEventListener('load', () => {
 
             showToast('Paciente agregado', 'success');
         } catch (err) {
-            console.error(err);
-            showToast('No se pudo agregar el paciente. Intentá nuevamente.', 'danger');
+            console.log(err);
+            showToast(err.message || 'No se pudo agregar el paciente. Intentá nuevamente.', 'danger');
         }
     });
 

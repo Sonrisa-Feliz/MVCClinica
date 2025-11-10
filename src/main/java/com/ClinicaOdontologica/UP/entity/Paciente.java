@@ -1,6 +1,7 @@
 package com.ClinicaOdontologica.UP.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,7 +32,7 @@ public class Paciente {
     @Column(unique = true)
     private String email;
     @OneToMany(mappedBy = "paciente", fetch = FetchType.LAZY)
-    @JsonIgnore
+    @JsonManagedReference
     private Set<Turno> turnos = new HashSet<>();
 
     public Paciente(Long id, String nombre, String apellido, Integer numeroContacto, LocalDate fechaIngreso, String email, Domicilio domicilio) {

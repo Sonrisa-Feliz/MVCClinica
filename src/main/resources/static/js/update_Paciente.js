@@ -1,38 +1,16 @@
-// /js/update_Paciente.js
 (() => {
     let editMode = false;
     let modalInstance = null;
 
-    // Campos "bloqueados" permanentemente
+    // Campos en modo readonly permanentemente
     const LOCKED_IDS = new Set(['ver_paciente_id', 'ver_domi_id', 'ver_fechaIngreso']);
 
-    // Selectors helpers
+    // Selectors helpers (Para seleccionar los objetos HTML facilmente)
     const $ = (sel, root = document) => root.querySelector(sel);
     const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
-    // Para ubicar y actualizar la fila en la tabla
-    const TABLE_BODY_SEL = '#pacienteTableBody';
-
-    function findRowByPacienteId(pacienteId) {
-        // 1) Intento por id="tr_{id}"
-        let row = document.getElementById(`tr_${pacienteId}`);
-        if (row) return row;
-
-        // 2) Intento por data-paciente-id
-        row = $(`${TABLE_BODY_SEL} tr[data-paciente-id="${pacienteId}"]`);
-        if (row) return row;
-
-        // 3) Fallback: buscar por la primera celda (columna Id)
-        const rows = $$( `${TABLE_BODY_SEL} tr` );
-        for (const r of rows) {
-            const firstCellText = r.cells?.[0]?.textContent?.trim();
-            if (firstCellText == String(pacienteId)) return r;
-        }
-        return null;
-    }
-
-    function updatePacienteRow(p) {
-        const row = document.getElementById(`tr_${p.id}`);
+    function updatePacienteRow(paciente) {
+        const row = document.getElementById(`tr_${paciente.id}`);
         if (!row) return;
 
         const setText = (sel, val) => {
@@ -40,12 +18,12 @@
             if (td) td.textContent = val ?? '';
         };
 
-        setText('.td_id', p.id);
-        setText('.td_nombre', p.nombre);
-        setText('.td_apellido', p.apellido);
-        setText('.td_contacto', p.numeroContacto);
-        setText('.td_fechaIngreso', p.fechaIngreso);
-        setText('.td_email', p.email);
+        setText('.td_id', paciente.id);
+        setText('.td_nombre', paciente.nombre);
+        setText('.td_apellido', paciente.apellido);
+        setText('.td_contacto', paciente.numeroContacto);
+        setText('.td_fechaIngreso', paciente.fechaIngreso);
+        setText('.td_email', paciente.email);
     }
 
     function setReadOnly(form, readonly) {
@@ -74,24 +52,6 @@
         $('#ver_domi_provincia').value  = paciente?.domicilio?.provincia ?? '';
     }
 
-    function toPayload() {
-        return {
-            id: $('#ver_paciente_id').value,
-            nombre: $('#ver_nombre').value,
-            apellido: $('#ver_apellido').value,
-            numeroContacto: $('#ver_numContacto').value,
-            fechaIngreso: $('#ver_fechaIngreso').value, // readonly pero lo mandamos igual
-            email: $('#ver_email').value,
-            domicilio: {
-                id: $('#ver_domi_id').value ? Number($('#ver_domi_id').value) : null,
-                calle: $('#ver_domi_calle').value.trim(),
-                numero: Number($('#ver_domi_numero').value),
-                localidad: $('#ver_domi_localidad').value.trim(),
-                provincia: $('#ver_domi_provincia').value.trim(),
-            },
-        };
-    }
-
     function showModal() {
         const modalEl = document.getElementById('verPaciente');
         modalInstance = modalInstance || new bootstrap.Modal(modalEl);
@@ -111,7 +71,21 @@
     $('#ver_paciente_form')?.addEventListener('submit', (event) => {
         event.preventDefault();
         const pacienteId = $('#ver_paciente_id').value;
-        const formData = toPayload();
+        const formData = {
+            id: $('#ver_paciente_id').value,
+            nombre: $('#ver_nombre').value,
+            apellido: $('#ver_apellido').value,
+            numeroContacto: $('#ver_numContacto').value,
+            fechaIngreso: $('#ver_fechaIngreso').value, // readonly pero lo mandamos igual
+            email: $('#ver_email').value,
+            domicilio: {
+                id: $('#ver_domi_id').value ? Number($('#ver_domi_id').value) : null,
+                calle: $('#ver_domi_calle').value.trim(),
+                numero: Number($('#ver_domi_numero').value),
+                localidad: $('#ver_domi_localidad').value.trim(),
+                provincia: $('#ver_domi_provincia').value.trim(),
+            },
+        };
 
         const url = `/paciente/${pacienteId}`;
         const settings = {
@@ -128,8 +102,8 @@
             })
             .then((maybeUpdated) => {
                 const updated = maybeUpdated ?? formData;     // Si no llega JSON, usamos lo que enviamos
-                updatePacienteRow(updated);                   // 🔄 Actualización en vivo de la fila
-                resetViewMode();                              // Volver a solo lectura
+                updatePacienteRow(updated);                   // Actualización de la fila en tiempo real en el html principal
+                resetViewMode();                              // Volver a modo readonly todos los elementos del modal
 
                 showToast('Paciente actualizado', 'success');
 
@@ -145,19 +119,19 @@
     $('#btnToggleEdit')?.addEventListener('click', () => {
         const btn = $('#btnToggleEdit');
         if (!editMode) {
-            // 👉 Pasar a modo edición
+            // Método para pasar a modo edición
             editMode = true;
             setReadOnly($('#ver_paciente_form'), false);
             btn.textContent = 'Guardar Cambios';
             btn.classList.remove('btn-danger');
-            btn.classList.add('btn-success'); // 💚 verde en modo "Guardar Cambios"
+            btn.classList.add('btn-success'); // Ponemos el botón verde en modo "Guardar Cambios"
         } else {
             // 💾 Guardar
             $('#ver_paciente_form').requestSubmit();
         }
     });
 
-    // Exponer findBy en window (tu tabla lo llama así)
+    // Exponemos findBy en la ventana actual (para que el botón de "ver" lo pueda ver)
     window.findBy = function (id) {
         const url = '/paciente/BuscarPorId/' + id;
         fetch(url, { method: 'GET' })
