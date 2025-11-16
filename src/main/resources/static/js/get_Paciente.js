@@ -54,7 +54,7 @@ window.addEventListener('load', function () {
                       data-bs-toggle="modal"
                       data-bs-target="#turnosModal"
                       data-paciente-id="${paciente.id}"
-                      data-paciente-nombre="${paciente.nombre} ${paciente.apellido}">
+                      data-paciente-nombre="${paciente.nombre} ${paciente.apellido}" >
                       <i class="bi bi-calendar3"></i>
                     </button>`;
 

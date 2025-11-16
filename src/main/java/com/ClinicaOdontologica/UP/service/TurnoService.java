@@ -34,6 +34,18 @@ public class TurnoService {
                 .map(this::turnoATurnoDTO);
     }
 
+    public List<TurnoDTO> buscarPorPaciente(Long id) {
+        return turnoRepository.findByPacienteId(id).stream()
+                .map(this::turnoATurnoDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<TurnoDTO> buscarPorOdontologo(Long id) {
+        return turnoRepository.findByOdontologoId(id).stream()
+                .map(this::turnoATurnoDTO)
+                .collect(Collectors.toList());
+    }
+
     public List<TurnoDTO> listarTurnos() {
         List<Turno> turnos = turnoRepository.findAll();
         List<TurnoDTO> listaTurnosDTO = new ArrayList<>();

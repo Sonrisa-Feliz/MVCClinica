@@ -31,8 +31,8 @@ public class Paciente {
     private Domicilio domicilio;
     @Column(unique = true)
     private String email;
-    @OneToMany(mappedBy = "paciente", fetch = FetchType.LAZY)
-    @JsonManagedReference(value="paciente-turno")
+    @OneToMany(mappedBy = "paciente", fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @JsonIgnore
     private Set<Turno> turnos = new HashSet<>();
 
     public Paciente(Long id, String nombre, String apellido, Integer numeroContacto, LocalDate fechaIngreso, String email, Domicilio domicilio) {

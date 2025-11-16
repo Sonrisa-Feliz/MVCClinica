@@ -47,8 +47,30 @@ public class DatosIniciales implements ApplicationRunner {
         Paciente paciente3 = new Paciente("Ned","Flanders", 567890345, LocalDate.of(2025,5,6), "Ned@EnCristo.com", domicilioNed);
         pacienteRepository.save(paciente3);
 
+        Domicilio domicilioCarl = new Domicilio("Avenida Siempre Viva", 742, "Springfield","Mississipi");
+        Paciente pacienteCarl = new Paciente("Carl","Carlson", 111222333, LocalDate.of(2025,11,10), "carl@planta.com", domicilioCarl);
+        pacienteRepository.save(pacienteCarl);
+
+        Domicilio domicilioLenny = new Domicilio("Avenida Siempre Viva", 744, "Springfield","Mississipi");
+        Paciente pacienteLenny = new Paciente("Lenny","Leonard", 222333444, LocalDate.of(2025,11,11), "lenny@planta.com", domicilioLenny);
+        pacienteRepository.save(pacienteLenny);
+
+        Domicilio domicilioBurns = new Domicilio("Mansión Burns", 1, "Springfield","Mississipi");
+        Paciente pacienteBurns = new Paciente("Montgomery","Burns", 333444555, LocalDate.of(2025,11,12), "burns@planta.com", domicilioBurns);
+        pacienteRepository.save(pacienteBurns);
+
+        Domicilio domicilioSmithers = new Domicilio("Mansión Burns", 2, "Springfield","Mississipi");
+        Paciente pacienteSmithers = new Paciente("Waylon","Smithers", 444555666, LocalDate.of(2025,11,13), "smithers@planta.com", domicilioSmithers);
+        pacienteRepository.save(pacienteSmithers);
+
         Odontologo odontologo = new Odontologo("Fake123123","Rivera","Nick");
         odontologoRepository.save(odontologo);
+
+        Odontologo odontologoHibbert = new Odontologo("SPR1001","Hibbert","Julius");
+        odontologoRepository.save(odontologoHibbert);
+
+        Odontologo odontologoMonroe = new Odontologo("SPR1002","Monroe","Marvin");
+        odontologoRepository.save(odontologoMonroe);
 
         Turno turno = new Turno(paciente,odontologo,LocalDate.of(2025,11,16));
         turnoRepository.save(turno);
@@ -56,6 +78,8 @@ public class DatosIniciales implements ApplicationRunner {
         Turno turno2 = new Turno(paciente3,odontologo,LocalDate.of(2025,11,15));
         turnoRepository.save(turno2);
 
+        Turno turno3 = new Turno(paciente3,odontologo,LocalDate.of(2025,9,15));
+        turnoRepository.save(turno3);
 
     }
 }

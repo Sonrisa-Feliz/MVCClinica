@@ -1,6 +1,7 @@
 package com.ClinicaOdontologica.UP.Controller;
 
 import com.ClinicaOdontologica.UP.Exception.ResourceNotFoundException;
+import com.ClinicaOdontologica.UP.dto.AgendarTurnoDTO;
 import com.ClinicaOdontologica.UP.dto.TurnoDTO;
 import com.ClinicaOdontologica.UP.entity.Odontologo;
 import com.ClinicaOdontologica.UP.entity.Paciente;
@@ -31,11 +32,16 @@ public class TurnoController {
     }
 
     @PostMapping
-    public ResponseEntity<TurnoDTO> registrarTurno(@RequestBody Turno turno) {
-        Optional<Paciente> pacienteBuscado = pacienteService.buscarPorId(turno.getPaciente().getId());
-        Optional<Odontologo> odontologoBuscado = odontologoService.buscarPorId(turno.getOdontologo().getId());
+    public ResponseEntity<TurnoDTO> registrarTurno(@RequestBody AgendarTurnoDTO agendarTurnoDTO) {
+        Optional<Paciente> pacienteBuscado = pacienteService.buscarPorId(agendarTurnoDTO.getPacienteId());
+        Optional<Odontologo> odontologoBuscado = odontologoService.buscarPorId(agendarTurnoDTO.getOdontologoId());
 
         if (pacienteBuscado.isPresent() && odontologoBuscado.isPresent()) {
+            Turno turno = new Turno(
+                    pacienteBuscado.get(),
+                    odontologoBuscado.get(),
+                    agendarTurnoDTO.getFecha()
+            );
             return ResponseEntity.ok(turnoService.guardarTurno(turno));
         } else {
             return ResponseEntity.badRequest().build();
@@ -45,6 +51,26 @@ public class TurnoController {
     @GetMapping
     public ResponseEntity<List<TurnoDTO>> listarTurnosDTO() {
         return ResponseEntity.ok(turnoService.listarTurnos());
+    }
+
+    @GetMapping("/TurnoPorPaciente/{id}")
+    public ResponseEntity<List<TurnoDTO>> listarTurnosDTOPorPaciente(@PathVariable Long id) throws ResourceNotFoundException {
+        Optional<Paciente> pacienteBuscado = pacienteService.buscarPorId(id);
+        if (pacienteBuscado.isEmpty()) {
+            throw new ResourceNotFoundException("Paciente no encontrado");
+        }
+        List<TurnoDTO> turnoBuscado = turnoService.buscarPorPaciente(id);
+        return ResponseEntity.ok(turnoBuscado);
+    }
+
+    @GetMapping("/TurnoPorOdontologo/{id}")
+    public ResponseEntity<List<TurnoDTO>> listarTurnosDTOPorOdontologo(@PathVariable Long id) throws ResourceNotFoundException {
+        Optional<Odontologo> odontologoBuscado = odontologoService.buscarPorId(id);
+        if (odontologoBuscado.isEmpty()) {
+            throw new ResourceNotFoundException("Odontólogo no encontrado");
+        }
+        List<TurnoDTO> turnoBuscado = turnoService.buscarPorOdontologo(id);
+        return ResponseEntity.ok(turnoBuscado);
     }
 
     @DeleteMapping("/{id}")

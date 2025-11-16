@@ -1,5 +1,6 @@
 package com.ClinicaOdontologica.UP.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -22,8 +23,8 @@ public class Odontologo {
     private String apellido;
     @Column(unique = true, nullable = false)
     private String matricula;
-    @OneToMany(mappedBy = "odontologo", fetch = FetchType.LAZY)
-    @JsonManagedReference(value="odontologo-turno")
+    @OneToMany(mappedBy = "odontologo", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnore
     private Set<Turno> turnos = new HashSet<>();
 
     public Odontologo(Long id, String nombre, String apellido, String matricula) {

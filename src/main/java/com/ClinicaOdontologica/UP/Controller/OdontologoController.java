@@ -1,6 +1,7 @@
 package com.ClinicaOdontologica.UP.Controller;
 
 import com.ClinicaOdontologica.UP.Exception.ResourceNotFoundException;
+import com.ClinicaOdontologica.UP.dto.OdontologoDTO;
 import com.ClinicaOdontologica.UP.entity.Odontologo;
 import com.ClinicaOdontologica.UP.service.OdontologoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,11 @@ public class OdontologoController {
     @GetMapping
     public ResponseEntity<List<Odontologo>> listaOdontologos(){
         return ResponseEntity.ok(odontologoService.buscarTodosLosOdontologos());
+    }
+
+    @GetMapping("/porDTO")
+    public ResponseEntity<List<OdontologoDTO>> listaOdontologosDTO(){
+        return ResponseEntity.ok(odontologoService.buscarOdontologosDTO());
     }
 
     @PostMapping
